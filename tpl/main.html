@@ -1,0 +1,37 @@
+<!--header-->
+<div ng-include="'tpl/include/header.html'"></div>
+
+<ion-content class="has-header has-footer">
+    <!--搜索框-->
+    <div class="list list-inset">
+        <div class="item item-input">
+            <i class="icon ion-search"></i>
+            <input type="text" ng-model="info.kw"
+                   placeholder="请输入要搜索的花名(玫瑰，百合,蛋糕)"/>
+        </div>
+    </div>
+    <div class="list list-inset">
+        <a href="#/f_detail/{{f.did}}" ng-repeat="f in flowersList"
+           class="item item-thumbnail-left">
+            <img ng-src="{{f.img}}" alt=""/>
+            <h2>{{f.name}}</h2>
+            <p>{{f.detail}}</p>
+            <p>{{f.material}}</p>
+            <p>{{f.price | currency:'￥'}}</p>
+        </a>
+
+    </div>
+
+    <ion-infinite-scroll on-infinite="loadMore()"
+            immediate-check="false" ng-if="hasMore">
+
+    </ion-infinite-scroll>
+    <div class="card" ng-hide="hasMore">
+        <div class="item">
+            没有更多数据可以加载了
+        </div>
+    </div>
+</ion-content>
+
+<!--footer-->
+<!--<div ng-include="'tpl/include/footer.html'"></div>-->

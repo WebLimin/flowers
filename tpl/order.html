@@ -1,0 +1,43 @@
+<div ng-include="'tpl/include/header.html'"></div>
+
+<ion-content class="has-header has-footer">
+    <div class="item item-divider">
+        <a href="#/f_main">首页</a> / <a href="#/f_detail">详情</a> / 订单
+    </div>
+    <div class="list list-inset" ng-hide="requestResult">
+        <label class="item item-input">
+            <span class="input-label">用户名称</span>
+            <input type="text" ng-model="order.user_name"
+                   placeholder="输入用户名"/>
+        </label>
+        <label class="item item-input">
+            <span class="input-label">送货地址</span>
+            <input type="text" ng-model="order.addr"
+                   placeholder="输入送货地址"/>
+        </label>
+        <label class="item item-input">
+            <span class="input-label">联系号码</span>
+            <input type="text" ng-model="order.phone"
+                   placeholder="输入联系号码"/>
+        </label>
+        <label class="item item-input">
+            <span class="input-label">选择性别</span>
+        </label>
+        <ion-list>
+            <ion-radio value="1" ng-model="order.sex">男</ion-radio>
+            <ion-radio value="2" ng-model="order.sex">女</ion-radio>
+        </ion-list>
+
+    <button ng-click="submitOrder()"
+            class="button button-block button-balanced">
+        下单支付</button>
+    </div>
+
+    <div class="card" ng-show="requestResult">
+        <div class="item">
+            {{requestResult}}
+        </div>
+    </div>
+</ion-content>
+
+<!--<div ng-include="'tpl/include/footer.html'"></div>-->
