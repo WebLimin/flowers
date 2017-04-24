@@ -52,6 +52,16 @@ app.config(function ($stateProvider, $ionicConfigProvider, $urlRouterProvider) {
             templateUrl: 'tpl/myCart.html',
             controller: 'myCartCtrl'
         })
+        .state('loGin', {
+            url: '/f_loGin',
+            templateUrl: 'tpl/login.html',
+            controller: 'Login'
+        })
+        .state('register', {
+            url: '/f_register',
+            templateUrl: 'tpl/register.html',
+            controller: 'Register'
+        })
     $urlRouterProvider.otherwise('/f_start')
 })
 
@@ -89,12 +99,14 @@ app.controller('mainCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
                 function (data) {
                     if (data.length > 0) {
                         $scope.flowersList = data;
+
                     }
                 }
             )
         }
     })
 }])
+
 
 app.controller('detailCtrl', ['$scope', '$fHttp', '$stateParams', '$ionicPopup',
     function ($scope, $fHttp, $stateParams, $ionicPopup) {
@@ -244,25 +256,60 @@ app.controller('myCartCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
 
     $scope.removeFlower = function (index) {
         var ions = document.querySelectorAll("ion-item");
-        for(var i =0,len=ions.length;i<len;i++) {
-            ions[i].onclick=function(){
+        for (var i = 0, len = ions.length; i < len; i++) {
+            ions[i].onclick = function () {
                 this.remove();
             }
         }
         $scope.deleteToServer(
-            $scope.cart[index].did ,
+            $scope.cart[index].did,
             $scope.cart[index].fCount
         );
 
         $scope.updateToServer(
             $scope.cart[index].did,
-            $scope.cart[index].fCount=0
+            $scope.cart[index].fCount = 0
         );
 
     }
 }]);
+var userId=" ";
+var uName=" ";
+
+/*用户登录部分*/
+app.controller('Login', ['$scope', '$fHttp',
+    function ($scope, $fHttp) {
+        $scope.info = {uNmae:"",upwd:""};
+        $scope.$watch('info.phone',function(){
+        $scope.uLogin = function () {
+            $fHttp.sendRequest(
+                'data/user_login.php?phone='+$scope.info.uName+"&upwd="+$scope.info.upwd,
+                function (data) {
+                    if(data==-1){
+                        alert("用户名或密码有误！");
+                    }else{
+                        alert("登录成功！欢迎回来！"+data.uname);
+                        sessionStorage.userId = data.userid;
+                        sessionStorage.uName = data.uname;
+                    }
+
+                }
+            )
+        }
+        })
+    }]);
+
+///*用户注册部分*/
+app.controller('Register', ['$scope', '$fHttp', function ($scope, $fHttp) {
+    $scope.uRegister = function () {
+        $scope.$watch('aa',function(){
 
 
+        })
+
+        console.log(1);
+    }
+}]);
 
 
 
