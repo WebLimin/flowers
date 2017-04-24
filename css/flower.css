@@ -5,3 +5,16 @@
     left:50%;
     transform: translate(-50%,-50%);
 }
+.navbar-login{
+    position: absolute;
+    right:10px;
+}
+.navbar-login li{
+    float:left;
+    margin:0 5px;
+    line-height: 34px;
+}
+.navbar-login li a{
+    text-decoration:none;
+    color:#fff;
+}

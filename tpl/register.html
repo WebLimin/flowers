@@ -7,14 +7,18 @@
 <ion-content class="has-header has-footer">
     <div class="list list-inset">
         <label class="item item-input">
-            <input type="text" placeholder="First Name">
+            <input type="text" ng-model="uregister.uName"
+                   placeholder="请输入用户名">
         </label>
         <label class="item item-input">
-            <input type="text" ng-model="aa"
-                   placeholder="Last Name">
+            <input type="text" ng-model="uregister.uPwd"
+                   placeholder="请输入密码">
+        </label>
+        <label class="item item-input">
+            <input type="text" ng-model="uregister.uPhone"
+                   placeholder="请输入手机号码">
         </label>
     </div>
-<div>{{aa}}</div>{{}}
     <button ng-click="uRegister()"
             class="button button-block button-positive">注册</button>
 </ion-content>

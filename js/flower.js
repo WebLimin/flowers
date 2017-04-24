@@ -273,43 +273,53 @@ app.controller('myCartCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
 
     }
 }]);
-var userId=" ";
-var uName=" ";
-
+var userId = " ";
+var uName = " ";
 /*用户登录部分*/
 app.controller('Login', ['$scope', '$fHttp',
     function ($scope, $fHttp) {
-        $scope.info = {uNmae:"",upwd:""};
-        $scope.$watch('info.phone',function(){
-        $scope.uLogin = function () {
-            $fHttp.sendRequest(
-                'data/user_login.php?phone='+$scope.info.uName+"&upwd="+$scope.info.upwd,
-                function (data) {
-                    if(data==-1){
-                        alert("用户名或密码有误！");
-                    }else{
-                        alert("登录成功！欢迎回来！"+data.uname);
-                        sessionStorage.userId = data.userid;
-                        sessionStorage.uName = data.uname;
-                    }
+        $scope.ulogin = {uName: "", upwd: ""};
+        $scope.$watch('ulogin', function () {
+            $scope.uLogin = function () {
+                $fHttp.sendRequest(
+                    'data/user_login.php?phone=' + $scope.ulogin.uName + "&upwd=" + $scope.ulogin.upwd,
+                    function (data) {
+                        if (data == -1) {
+                            alert("用户名或密码有误！");
+                        } else {
+                            alert("登录成功！欢迎回来！" + data.uname);
+                            sessionStorage.userId = data.userid;
+                            sessionStorage.uName = data.uname;
+                            location.href="index.html#/f_main";
+                        }
 
-                }
-            )
-        }
+                    }
+                )
+            }
         })
     }]);
 
-///*用户注册部分*/
-app.controller('Register', ['$scope', '$fHttp', function ($scope, $fHttp) {
-    $scope.uRegister = function () {
-        $scope.$watch('aa',function(){
-
-
+/*用户注册部分*/
+app.controller('Register', ['$scope', '$fHttp',
+    function ($scope, $fHttp) {
+        $scope.uregister = {uName: '', uPwd: '', uPhone: ''};
+        $scope.$watch('uregister', function () {
+            $scope.uRegister = function () {
+                $fHttp.sendRequest(
+                    'data/user_register.php?uName=' + $scope.uregister.uName +
+                    "&uPhone=" + $scope.uregister.uPhone + "&uPwd=" + $scope.uregister.uPwd,
+                    function (data) {
+                       if(data=='succ'){
+                           alert('注册成功！');
+                            location.href="index.html#/f_loGin";
+                       }else{
+                           alert('注册失败！手机号码被已注册');
+                       }
+                    }
+                )
+            }
         })
-
-        console.log(1);
-    }
-}]);
+    }]);
 
 
 
