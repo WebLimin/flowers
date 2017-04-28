@@ -1,8 +1,13 @@
-<ion-header-bar class="bar bar-header bar-calm">
-    <h1 class="title navbar-title">鲜花商城</h1>
-    <ul class="navbar-login" id="top_login">
-        <li> <a href="#/f_loGin">登录</a></li>
-        <li> |</li>
-        <li><a href="#/f_register">注册</a></li>
+<ion-header-bar class="bar bar-header bar-balanced">
+    <h3 class="header-title">鲜花商城</h3>
+    <ul class="navbar-login" ng-show="unlogin" ng-controller="Login">
+        <li><span ng-click="jump('loGin')">登录</span></li>
+        <li>|</li>
+        <li><span ng-click="jump('register')">注册</span></li>
+    </ul>
+    <ul class="navbar-login" ng-show="!unlogin" ng-controller="Login">
+        <li>欢 迎 登 录 ,昵称 <b>{{username}}</b></li>
+        <li>|</li>
+        <li><p ng-click="logout()">退出</p></li>
     </ul>
 </ion-header-bar>

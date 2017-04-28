@@ -4,7 +4,7 @@
 
     <ion-list class="list list-inset">
         <ion-item ng-click="open()">关于</ion-item>
-        <ion-item ng-click="jump('start')">退出登录</ion-item>
+        <ion-item ng-click="logout()" ng-hide="unlogin" ng-controller="Login">退出登录</ion-item>
     </ion-list>
 
 </ion-content>

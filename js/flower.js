@@ -6,14 +6,13 @@ app.service('$fHttp', ['$http', '$ionicLoading',
         this.sendRequest = function (url, successCallback) {
             $ionicLoading.show({
                 template: 'loading...'
-            })
+            });
             $http.get(url).success(function (data) {
                 $ionicLoading.hide();
                 successCallback(data);
             });
         }
-
-    }])
+    }]);
 
 app.config(function ($stateProvider, $ionicConfigProvider, $urlRouterProvider) {
     $ionicConfigProvider.tabs.position('bottom');
@@ -61,15 +60,23 @@ app.config(function ($stateProvider, $ionicConfigProvider, $urlRouterProvider) {
             url: '/f_register',
             templateUrl: 'tpl/register.html',
             controller: 'Register'
-        })
+        });
     $urlRouterProvider.otherwise('/f_start')
-})
+});
 
 app.controller('parentCtrl', ['$scope', '$state', function ($scope, $state) {
     $scope.jump = function (desState, args) {
         $state.go(desState, args);
+    };
+
+    //退出登录之后，将显示登录和注册
+    $scope.logout = function () {
+        $scope.unlogin = true;
+        sessionStorage.userId = '';
+        sessionStorage.uName = '';
+        $state.go("start");
     }
-}])
+}]);
 
 app.controller('mainCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
     $scope.hasMore = true;
@@ -90,7 +97,7 @@ app.controller('mainCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
                 $scope.flowersList = $scope.flowersList.concat(data);
                 $scope.$broadcast('scroll.infiniteScrollComplete')
             })
-    }
+    };
 
     $scope.$watch('info.kw', function () {
         if ($scope.info.kw) {
@@ -105,8 +112,7 @@ app.controller('mainCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
             )
         }
     })
-}])
-
+}]);
 
 app.controller('detailCtrl', ['$scope', '$fHttp', '$stateParams', '$ionicPopup',
     function ($scope, $fHttp, $stateParams, $ionicPopup) {
@@ -116,9 +122,7 @@ app.controller('detailCtrl', ['$scope', '$fHttp', '$stateParams', '$ionicPopup',
                 $scope.f = data[0];
             }
         );
-        sessionStorage.did=[];
-        sessionStorage.did=$stateParams.id;
-        console.log(sessionStorage.did);
+
         $scope.addToCart = function () {
             $fHttp.sendRequest(
                 'data/cart_update.php?uid=' + sessionStorage.userId + '&did=' + $stateParams.id + "&count=-1",
@@ -127,9 +131,20 @@ app.controller('detailCtrl', ['$scope', '$fHttp', '$stateParams', '$ionicPopup',
                         $ionicPopup.alert({
                             template: '添加到购物车成功'
                         });
+                        console.log(sessionStorage.did);
+                        console.log("a");
+                    } else {
+                        if (!sessionStorage.userId) {
+                            $ionicPopup.alert({
+                                template: '我目前技能水平有限,请登录在添加！'
+                            });
+                        } else {
+                            $ionicPopup.alert({
+                                template: '添加到购物车失败'
+                            });
+                        }
                     }
                 }
-
             )
         }
     }
@@ -137,10 +152,9 @@ app.controller('detailCtrl', ['$scope', '$fHttp', '$stateParams', '$ionicPopup',
 
 app.controller('orderCtrl', ['$scope', '$fHttp', '$stateParams', '$httpParamSerializerJQLike',
     function ($scope, $fHttp, $stateParams, $httpParamSerializerJQLike) {
-        $scope.order = {did: sessionStorage.did,userid:sessionStorage.userId};
+        $scope.order = {did: sessionStorage.did, userid: sessionStorage.userId};
         $scope.submitOrder = function () {
             var result = $httpParamSerializerJQLike($scope.order);
-            console.log(result);
             $fHttp.sendRequest(
                 'data/order_add.php?' + result,
                 function (data) {
@@ -170,7 +184,7 @@ app.controller('settingCtrl', ['$scope', '$ionicModal',
     function ($scope, $ionicModal) {
 
         $scope.infoList = [
-            {name: '开发者', value: 'limin'},
+            {name: '开发者', value: '李敏'},
             {name: '版本号', value: 'v1.0'},
             {name: 'email', value: 'weblimin@sina.com'}
         ];
@@ -191,12 +205,13 @@ app.controller('settingCtrl', ['$scope', '$ionicModal',
             $scope.modal.hide();
         };
 
+
     }]);
 
 app.controller('myCartCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
     $scope.editShowMsg = '编辑';
     $scope.editEnable = false;
-
+    $scope.cartDetail = [];
     $scope.funcToggleEdit = function () {
         $scope.editEnable = !$scope.editEnable;
         if ($scope.editEnable) {
@@ -204,38 +219,35 @@ app.controller('myCartCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
         } else {
             $scope.editShowMsg = '编辑';
         }
+    };
+    if (sessionStorage.userId) {
+        $fHttp.sendRequest(
+            'data/cart_select.php?uid=' + sessionStorage.userId,
+            function (serverDate) {
+                $scope.cart = serverDate.data;
+            }
+        )
     }
-
-    $fHttp.sendRequest(
-        'data/cart_select.php?uid=' + sessionStorage.userId,
-        function (serverDate) {
-            $scope.cart = serverDate.data;
-        }
-    )
-
     $scope.sumAll = function () {
         var result = 0;
         angular.forEach($scope.cart, function (value, key) {
             result += parseInt(value.price * value.fCount);
-        })
+        });
         return result;
-    }
+    };
 
     $scope.updateToServer = function (id, count) {
-        $fHttp.sendRequest(
-            'data/cart_update.php?uid=' + sessionStorage.userId + '&did=' + id + "&count=" + count,
-            function (data) {
-
-            }
-        )
-    }
+        if (count != 0) {
+            $fHttp.sendRequest(
+                'data/cart_update.php?uid=' + sessionStorage.userId + '&did=' + id + "&count=" + count
+            )
+        }
+    };
     $scope.deleteToServer = function (id, count) {
         $fHttp.sendRequest(
-            'data/cart_delete.php?uid=' + sessionStorage.userId + '&did=' + id + "&count=" + count,
-            function (data) {
-            }
+            'data/cart_delete.php?uid=' + sessionStorage.userId + '&did=' + id + "&count=" + count
         )
-    }
+    };
 
     $scope.add = function (index) {
         $scope.cart[index].fCount++;
@@ -243,7 +255,7 @@ app.controller('myCartCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
             $scope.cart[index].did,
             $scope.cart[index].fCount
         );
-    }
+    };
 
     $scope.reduce = function (index) {
         var num = $scope.cart[index].fCount;
@@ -256,31 +268,27 @@ app.controller('myCartCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
             $scope.cart[index].did,
             $scope.cart[index].fCount
         );
-    }
+    };
 
     $scope.removeFlower = function (index) {
-        var ions = document.querySelectorAll("ion-item");
-        for (var i = 0, len = ions.length; i < len; i++) {
-            ions[i].onclick = function () {
-                this.remove();
-            }
-        }
         $scope.deleteToServer(
             $scope.cart[index].did,
             $scope.cart[index].fCount
         );
-
-        $scope.updateToServer(
-            $scope.cart[index].did,
-            $scope.cart[index].fCount = 0
-        );
-
+        $scope.cart.splice(index, 1);
     }
 }]);
 
 /*用户登录部分*/
-app.controller('Login', ['$scope', '$fHttp', '$ionicPopup',
-    function ($scope, $fHttp, $ionicPopup) {
+app.controller('Login', ['$scope', '$fHttp', '$ionicPopup', '$state',
+    function ($scope, $fHttp, $ionicPopup, $state) {
+        //判断是否登录
+        if (!sessionStorage.userId) {
+            $scope.unlogin = true;
+        } else {
+            $scope.unlogin = false;
+            $scope.username = sessionStorage.uName;
+        }
         $scope.ulogin = {uName: "", upwd: ""};
         $scope.$watch('ulogin', function () {
             $scope.uLogin = function () {
@@ -295,20 +303,21 @@ app.controller('Login', ['$scope', '$fHttp', '$ionicPopup',
                             $ionicPopup.alert({
                                 template: "登录成功！欢迎回来！" + data.uname
                             });
+                            //登录成功之后，保存id,name
                             sessionStorage.userId = data.userid;
                             sessionStorage.uName = data.uname;
-                            location.href = "index.html#/f_main";
-                        }
+                            $state.go('main');
 
+                        }
                     }
                 )
             }
-        })
+        });
     }]);
 
 /*用户注册部分*/
-app.controller('Register', ['$scope', '$fHttp', '$ionicPopup',
-    function ($scope, $fHttp, $ionicPopup) {
+app.controller('Register', ['$scope', '$fHttp', '$ionicPopup', '$state',
+    function ($scope, $fHttp, $ionicPopup, $state) {
         $scope.uregister = {uName: '', uPwd: '', uPhone: ''};
         $scope.$watch('uregister', function () {
             $scope.uRegister = function () {
@@ -320,7 +329,7 @@ app.controller('Register', ['$scope', '$fHttp', '$ionicPopup',
                             $ionicPopup.alert({
                                 template: '注册成功！'
                             });
-                            location.href = "index.html#/f_loGin";
+                            $state.go('loGin');
                         } else {
                             $ionicPopup.alert({
                                 template: '注册失败！手机号码被已注册'

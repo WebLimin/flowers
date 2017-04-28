@@ -1,5 +1,5 @@
 <?php
-
+header("Content-Type:application/json");
 @$uid = $_REQUEST['uid'] or die('uid required');
 
 require('init.php');

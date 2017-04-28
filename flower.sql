@@ -38,7 +38,7 @@ CREATE TABLE t_users(
 	phone VARCHAR(32)     /*电话*/
 );
 INSERT INTO t_users VALUES
-(NULL,'hmm','123','13512345678'),
+(NULL,'hmm','123','123123'),
 (NULL,'lilei','123','13501234567'),
 (NULL,'kaka','123','13523456789');
 
@@ -47,21 +47,12 @@ INSERT INTO t_users VALUES
 CREATE TABLE t_order(
     	oid INT PRIMARY KEY AUTO_INCREMENT,  /*订单ID*/
     	userid INT,      /*用户*/
-	phone VARCHAR(16),   /*联系电话*/
-	user_name VARCHAR(16),  /*收货方用户名*/
-	order_time LONG,  /*下单时间*/
+			phone VARCHAR(16),   /*联系电话*/
+			user_name VARCHAR(16),  /*收货方用户名*/
+			order_time LONG,  /*下单时间*/
     	addr VARCHAR(256),   /*订单地址*/
-	totalprice FlOAT(6,2)   /*订单总价*/
+			totalprice FlOAT(8,2)   /*订单总价*/
 );
-
-INSERT INTO t_order VALUES
-
-(NULL,1,'13512345678','hmm',1445154859209,'深圳宝安',201.5),
-(NULL,2,'13501234567','lilei',1445154859209,'深圳宝安',202.5),
-(NULL,2,'13501234567','lilei',1445154859209,'深圳宝安',203.5),
-(NULL,3,'13523456789','kaka',1445154859209,'深圳宝安',204.5),
-(NULL,3,'13523456789','kaka',1445154859209,'深圳宝安',205.5);
-
 
 CREATE TABLE t_cart(
     ctid INT PRIMARY KEY AUTO_INCREMENT,  /*购物车编号*/

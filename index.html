@@ -6,13 +6,12 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
     <link rel="stylesheet" href="css/ionic.css"/>
     <link rel="stylesheet" href="css/flower.css"/>
-    <script src="js/ionic.bundle.js"></script>
-    <script src="js/flower.js"></script>
+
     <title></title>
 </head>
 <body ng-controller="parentCtrl">
 
-    <div ui-view></div>
+    <div ui-view id="f1"></div>
 
     <ion-tabs class="tabs-icon-top">
         <ion-tab title="主页"
@@ -28,6 +27,7 @@
                  on-select="jump('setting')"
                  icon="ion-gear-a"></ion-tab>
     </ion-tabs>
-
+    <script src="js/ionic.bundle.js"></script>
+    <script src="js/flower.js"></script>
 </body>
 </html>

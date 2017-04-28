@@ -1,17 +1,16 @@
 
-<ion-header-bar>
-    <h1 class="title">购物车</h1>
-    <button
-            ng-click="funcToggleEdit()"
-            class="button button-clear button-dark">
-        {{editShowMsg}}
-    </button>
-</ion-header-bar>
+<div ng-include="'tpl/include/header.html'"></div>
 
-<ion-content>
+<ion-content class="has-header has-footer">
 
+    <h3 class="text-center" >购物车</h3>
+    <div class="text-right">
+        <button ng-click="funcToggleEdit()" class="button button-clear button-dark">
+            {{editShowMsg}}
+        </button>
+    </div>
     <ion-list class="list list-inset">
-        <ion-item ng-repeat="f in cart">
+        <ion-item ng-repeat="f in cart ">
             <div class="row">
                 <div class="col col-15">
                     <img ng-src="{{f.img}}" alt=""/>
@@ -39,9 +38,9 @@
         <ion-item>
             <div class="text-right">
                 <p style="display: inline-block;vertical-align: middle">合计：{{sumAll()}}</p>
-                <button ng-click="jump('order')"
-                        class="button button-balanced button-small"
-                        style="display: inline-block;vertical-align: middle">确定下单</button>
+                <button ng-click="jump('order')" class="button button-balanced button-small" style="display: inline-block;vertical-align: middle">
+                    确定下单
+                </button>
             </div>
         </ion-item>
     </ion-list>
