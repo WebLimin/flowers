@@ -2,7 +2,6 @@ var app = angular.module('flower', ['ionic']);
 
 app.service('$fHttp', ['$http', '$ionicLoading',
     function ($http, $ionicLoading) {
-
         this.sendRequest = function (url, successCallback) {
             $ionicLoading.show({
                 template: 'loading...'
@@ -31,8 +30,14 @@ app.config(function ($stateProvider, $ionicConfigProvider, $urlRouterProvider) {
             templateUrl: 'tpl/detail.html',
             controller: 'detailCtrl'
         })
+        .state('myCart', {
+            url: '/f_myCart',
+            templateUrl: 'tpl/myCart.html',
+            controller: 'myCartCtrl'
+        })
         .state('order', {
-            url: '/f_order/:id',
+            url: '/f_order/:totalprice',
+            params: {'cartDetail': null},
             templateUrl: 'tpl/order.html',
             controller: 'orderCtrl'
         })
@@ -46,11 +51,7 @@ app.config(function ($stateProvider, $ionicConfigProvider, $urlRouterProvider) {
             templateUrl: 'tpl/setting.html',
             controller: 'settingCtrl'
         })
-        .state('myCart', {
-            url: '/f_myCart',
-            templateUrl: 'tpl/myCart.html',
-            controller: 'myCartCtrl'
-        })
+
         .state('loGin', {
             url: '/f_loGin',
             templateUrl: 'tpl/login.html',
@@ -77,7 +78,7 @@ app.controller('parentCtrl', ['$scope', '$state', function ($scope, $state) {
         $state.go("start");
     }
 }]);
-
+/*商品主页展示部分*/
 app.controller('mainCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
     $scope.hasMore = true;
     $scope.info = {kw: ''};
@@ -113,7 +114,7 @@ app.controller('mainCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
         }
     })
 }]);
-
+/*产品详情部分*/
 app.controller('detailCtrl', ['$scope', '$fHttp', '$stateParams', '$ionicPopup',
     function ($scope, $fHttp, $stateParams, $ionicPopup) {
         $fHttp.sendRequest(
@@ -125,18 +126,16 @@ app.controller('detailCtrl', ['$scope', '$fHttp', '$stateParams', '$ionicPopup',
 
         $scope.addToCart = function () {
             $fHttp.sendRequest(
-                'data/cart_update.php?uid=' + sessionStorage.userId + '&did=' + $stateParams.id + "&count=-1",
+                'data/cart_update.php?uid=' + sessionStorage.userId + '&id=' + $stateParams.id + "&count=-1",
                 function (data) {
                     if (data.msg == 'succ') {
                         $ionicPopup.alert({
                             template: '添加到购物车成功'
                         });
-                        console.log(sessionStorage.did);
-                        console.log("a");
                     } else {
                         if (!sessionStorage.userId) {
                             $ionicPopup.alert({
-                                template: '我目前技能水平有限,请登录在添加！'
+                                template: '请登录再添加！'
                             });
                         } else {
                             $ionicPopup.alert({
@@ -149,10 +148,11 @@ app.controller('detailCtrl', ['$scope', '$fHttp', '$stateParams', '$ionicPopup',
         }
     }
 ]);
-
+/*下单部分*/
 app.controller('orderCtrl', ['$scope', '$fHttp', '$stateParams', '$httpParamSerializerJQLike',
     function ($scope, $fHttp, $stateParams, $httpParamSerializerJQLike) {
-        $scope.order = {did: sessionStorage.did, userid: sessionStorage.userId};
+        $scope.order = {cartDetail: $stateParams.cartDetail,
+            totalprice:$stateParams.totalprice,userid: sessionStorage.userId};
         $scope.submitOrder = function () {
             var result = $httpParamSerializerJQLike($scope.order);
             $fHttp.sendRequest(
@@ -170,45 +170,8 @@ app.controller('orderCtrl', ['$scope', '$fHttp', '$stateParams', '$httpParamSeri
             )
         }
     }]);
-app.controller('myOrderCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
-    if (sessionStorage.userId) {
-        $fHttp.sendRequest(
-            'data/order_getbyuserid.php?userid=' + sessionStorage.userId,
-            function (serverData) {
-                $scope.orderList = serverData.data;
-            }
-        )
-    }
-}]);
-app.controller('settingCtrl', ['$scope', '$ionicModal',
-    function ($scope, $ionicModal) {
-
-        $scope.infoList = [
-            {name: '开发者', value: '李敏'},
-            {name: '版本号', value: 'v1.0'},
-            {name: 'email', value: 'weblimin@sina.com'}
-        ];
-
-        $ionicModal
-            .fromTemplateUrl('tpl/about.html', {
-                scope: $scope
-            })
-            .then(function (modal) {
-                $scope.modal = modal;
-            });
-
-        $scope.open = function () {
-            $scope.modal.show();
-        };
-
-        $scope.close = function () {
-            $scope.modal.hide();
-        };
-
-
-    }]);
-
-app.controller('myCartCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
+/*购物车产品部分*/
+app.controller('myCartCtrl', ['$scope', '$fHttp','$state', function ($scope, $fHttp,$state) {
     $scope.editShowMsg = '编辑';
     $scope.editEnable = false;
     $scope.cartDetail = [];
@@ -233,6 +196,7 @@ app.controller('myCartCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
         angular.forEach($scope.cart, function (value, key) {
             result += parseInt(value.price * value.fCount);
         });
+        $scope.sumprice=result;
         return result;
     };
 
@@ -276,8 +240,52 @@ app.controller('myCartCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
             $scope.cart[index].fCount
         );
         $scope.cart.splice(index, 1);
+    };
+
+    $scope.jumpOrder=function(){
+        $state.go('order',{'cartDetail':$scope.cart,totalprice:$scope.sumprice});
+
+    }
+
+}]);
+/*个人订单部分*/
+app.controller('myOrderCtrl', ['$scope', '$fHttp', function ($scope, $fHttp) {
+    if (sessionStorage.userId) {
+        $fHttp.sendRequest(
+            'data/order_getbyuserid.php?userid=' + sessionStorage.userId,
+            function (serverData) {
+                $scope.orderList = serverData.data;
+            }
+        )
     }
 }]);
+
+/*设置部分*/
+app.controller('settingCtrl', ['$scope', '$ionicModal',
+    function ($scope, $ionicModal) {
+
+        $scope.infoList = [
+            {name: '开发者', value: '李敏'},
+            {name: '版本号', value: 'v1.1.7'},
+            {name: 'email', value: 'weblimin@sina.com'}
+        ];
+
+        $ionicModal
+            .fromTemplateUrl('tpl/about.html', {
+                scope: $scope
+            })
+            .then(function (modal) {
+                $scope.modal = modal;
+            });
+
+        $scope.open = function () {
+            $scope.modal.show();
+        };
+
+        $scope.close = function () {
+            $scope.modal.hide();
+        };
+    }]);
 
 /*用户登录部分*/
 app.controller('Login', ['$scope', '$fHttp', '$ionicPopup', '$state',
@@ -307,7 +315,6 @@ app.controller('Login', ['$scope', '$fHttp', '$ionicPopup', '$state',
                             sessionStorage.userId = data.userid;
                             sessionStorage.uName = data.uname;
                             $state.go('main');
-
                         }
                     }
                 )
